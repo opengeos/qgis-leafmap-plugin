@@ -27,7 +27,7 @@ tags=leafmap, transparency, swipe, compare, layers, visualization, split, map
 
 homepage=https://github.com/opengeos/qgis-leafmap-plugin
 category=Raster
-icon=icons/icon.svg
+icon=icons/logo.png
 
 experimental=False
 deprecated=False
