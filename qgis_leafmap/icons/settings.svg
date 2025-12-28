@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gearGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#78909C;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#455A64;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Gear outer shape -->
+  <path d="M32 6 L36 6 L37 12 L40 13 L45 9 L48 12 L44 17 L45 20 L51 21 L51 25 L45 26 L44 29 L48 34 L45 37 L40 33 L37 34 L36 40 L32 40 L31 34 L28 33 L23 37 L20 34 L24 29 L23 26 L17 25 L17 21 L23 20 L24 17 L20 12 L23 9 L28 13 L31 12 L32 6
+          M32 44 L36 44 L37 50 L40 51 L45 47 L48 50 L44 55 L45 58 L51 59 L51 63 L45 64 L44 67 L48 72 L45 75 L40 71 L37 72 L36 78 L32 78 L31 72 L28 71 L23 75 L20 72 L24 67 L23 64 L17 63 L17 59 L23 58 L24 55 L20 50 L23 47 L28 51 L31 50 L32 44"
+        fill="url(#gearGrad)" transform="translate(0, -3) scale(1)"/>
+  <!-- Gear teeth (outer ring with notches) -->
+  <path d="M32 8
+           L35 8 L36 14 L40 15 L44 11 L47 14 L43 18 L44 22 L50 23 L50 27 L44 28 L43 32 L47 36 L44 39 L40 35 L36 36 L35 42 L29 42 L28 36 L24 35 L20 39 L17 36 L21 32 L20 28 L14 27 L14 23 L20 22 L21 18 L17 14 L20 11 L24 15 L28 14 L29 8 Z"
+        fill="url(#gearGrad)" stroke="#37474F" stroke-width="1"/>
+  <!-- Inner circle -->
+  <circle cx="32" cy="25" r="8" fill="#ECEFF1" stroke="#37474F" stroke-width="1"/>
+  <!-- Center dot -->
+  <circle cx="32" cy="25" r="3" fill="#455A64"/>
+  <!-- Decorative lines on gear -->
+  <circle cx="32" cy="25" r="5" fill="none" stroke="#90A4AE" stroke-width="1"/>
+  <!-- Additional small gear -->
+  <circle cx="48" cy="46" r="10" fill="url(#gearGrad)" stroke="#37474F" stroke-width="1"/>
+  <path d="M48 38 L50 38 L50 42 L53 43 L55 40 L57 42 L55 45 L55 47 L59 48 L59 50 L55 51 L55 53 L57 56 L55 58 L53 55 L50 56 L50 60 L46 60 L46 56 L43 55 L41 58 L39 56 L41 53 L41 51 L37 50 L37 48 L41 47 L41 45 L39 42 L41 40 L43 43 L46 42 L46 38 Z"
+        fill="url(#gearGrad)" stroke="#37474F" stroke-width="0.5"/>
+  <circle cx="48" cy="49" r="4" fill="#ECEFF1" stroke="#37474F" stroke-width="0.5"/>
+  <circle cx="48" cy="49" r="1.5" fill="#455A64"/>
+</svg>
