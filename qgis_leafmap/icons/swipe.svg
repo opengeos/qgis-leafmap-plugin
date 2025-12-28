@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="leftGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#66BB6A;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#388E3C;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="rightGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#42A5F5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1976D2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Left panel (green - layer 1) -->
+  <rect x="6" y="10" width="24" height="44" rx="3" fill="url(#leftGrad)"/>
+  <!-- Right panel (blue - layer 2) -->
+  <rect x="34" y="10" width="24" height="44" rx="3" fill="url(#rightGrad)"/>
+  <!-- Divider line -->
+  <rect x="29" y="6" width="6" height="52" rx="2" fill="white" stroke="#424242" stroke-width="1"/>
+  <!-- Divider handle -->
+  <rect x="30" y="26" width="4" height="12" rx="1" fill="#424242"/>
+  <!-- Handle arrows -->
+  <path d="M28 32 L24 28 L24 36 Z" fill="#424242"/>
+  <path d="M36 32 L40 28 L40 36 Z" fill="#424242"/>
+  <!-- Layer indicators -->
+  <circle cx="18" cy="22" r="6" fill="white" fill-opacity="0.4"/>
+  <circle cx="46" cy="22" r="6" fill="white" fill-opacity="0.4"/>
+  <!-- Layer labels -->
+  <text x="18" y="25" font-family="Arial" font-size="8" font-weight="bold" fill="white" text-anchor="middle">L</text>
+  <text x="46" y="25" font-family="Arial" font-size="8" font-weight="bold" fill="white" text-anchor="middle">R</text>
+</svg>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#66BB6A;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2E7D32;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="mapGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#42A5F5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1565C0;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="32" cy="32" r="30" fill="url(#mapGrad)" stroke="#0D47A1" stroke-width="2"/>
+  <!-- Map grid lines -->
+  <path d="M8 32 L56 32 M32 8 L32 56 M12 18 L52 18 M12 46 L52 46 M18 12 L18 52 M46 12 L46 52"
+        stroke="rgba(255,255,255,0.3)" stroke-width="1" fill="none"/>
+  <!-- Leaf shape -->
+  <path d="M32 10 C20 20, 18 35, 32 52 C46 35, 44 20, 32 10 Z"
+        fill="url(#leafGrad)" stroke="#1B5E20" stroke-width="1.5"/>
+  <!-- Leaf vein -->
+  <path d="M32 14 L32 48 M32 22 L26 28 M32 22 L38 28 M32 32 L24 38 M32 32 L40 38"
+        stroke="#1B5E20" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</svg>

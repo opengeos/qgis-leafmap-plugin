@@ -1,0 +1,41 @@
+[general]
+name=Leafmap
+qgisMinimumVersion=3.28
+description=A QGIS plugin for interactive layer comparison with transparency control and swipe tools.
+version=0.1.0
+author=Qiusheng Wu
+email=giswqs@gmail.com
+
+about=Leafmap is a QGIS plugin that provides powerful tools for layer visualization and comparison.
+
+    Features:
+    - Interactive layer transparency control with real-time preview
+    - Swipe tool for comparing two layers side-by-side (similar to ipyleaflet split control)
+    - Dockable panels that can be positioned anywhere in the QGIS interface
+    - Plugin update checker that fetches the latest version from GitHub
+    - Settings panel for configuring plugin options
+
+    This plugin is inspired by the Python leafmap package and brings similar
+    layer comparison capabilities to the QGIS desktop environment.
+
+tracker=https://github.com/opengeos/qgis-leafmap-plugin/issues
+repository=https://github.com/opengeos/qgis-leafmap-plugin
+
+hasProcessingProvider=no
+
+tags=leafmap, transparency, swipe, compare, layers, visualization, split, map
+
+homepage=https://github.com/opengeos/qgis-leafmap-plugin
+category=Raster
+icon=icons/icon.svg
+
+experimental=False
+deprecated=False
+
+changelog=
+    0.1.0 - Initial release
+        - Layer transparency control with interactive slider
+        - Swipe tool for comparing layers (split view)
+        - Settings panel for plugin configuration
+        - Update checker for GitHub releases
+
