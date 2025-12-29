@@ -69,11 +69,17 @@ class SwipeMapItem(QgsMapCanvasItem):
         """Set the left layer for comparison."""
         self.left_layer = layer
         self._needs_render = True
+        if self.is_active:
+            self._render_right_layer()
+            self.update()
 
     def set_right_layer(self, layer):
         """Set the right layer for comparison."""
         self.right_layer = layer
         self._needs_render = True
+        if self.is_active:
+            self._render_right_layer()
+            self.update()
 
     def set_swipe_position(self, position):
         """Set the swipe divider position.
@@ -92,6 +98,8 @@ class SwipeMapItem(QgsMapCanvasItem):
         """
         self.orientation = orientation
         self._needs_render = True
+        if self.is_active:
+            self._render_right_layer()
         self.update()
 
     def activate(self):
@@ -143,6 +151,8 @@ class SwipeMapItem(QgsMapCanvasItem):
             self.canvas.renderComplete.connect(self._on_render_complete)
             self._connected = True
 
+        # Initial render of right layer
+        self._render_right_layer()
         self.canvas.refresh()
 
     def deactivate(self):
@@ -185,10 +195,14 @@ class SwipeMapItem(QgsMapCanvasItem):
     def _on_extent_changed(self):
         """Handle canvas extent change."""
         self._needs_render = True
+        # Render will be triggered by subsequent render_complete signal
 
     def _on_render_complete(self, painter):
         """Handle canvas render complete."""
-        self._needs_render = True
+        # Render right layer after canvas completes rendering
+        if self.is_active and self._needs_render:
+            self._render_right_layer()
+            self.update()
 
     def _render_right_layer(self):
         """Render the right layer to an offscreen image."""
@@ -250,10 +264,6 @@ class SwipeMapItem(QgsMapCanvasItem):
 
             if width <= 0 or height <= 0:
                 return
-
-            # Render right layer if needed
-            if self._needs_render or self._right_layer_image is None:
-                self._render_right_layer()
 
             # Calculate divider position
             if self.orientation == "vertical":
@@ -722,8 +732,6 @@ class SwipeDockWidget(QDockWidget):
         # Update position and trigger repaint
         self.swipe_item.swipe_position = value / 100.0
         self.swipe_item.update()
-        # Force canvas to repaint the item
-        self.canvas.scene().update()
 
     def _on_activate_clicked(self, checked):
         """Handle activate button click."""
@@ -748,7 +756,11 @@ class SwipeDockWidget(QDockWidget):
             self.activate_btn.setText("Deactivate Swipe")
             self.swipe_item.activate()
             self.swipe_tool.install()
-            self.canvas.scene().addItem(self.swipe_item)
+
+            # Only add item if it's not already in the scene
+            if self.swipe_item.scene() is None:
+                self.canvas.scene().addItem(self.swipe_item)
+
             self.canvas.refresh()
 
             self.status_label.setText("Swipe active - drag divider on map")

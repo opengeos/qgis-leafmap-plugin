@@ -5,16 +5,70 @@
       <stop offset="0%" style="stop-color:#42A5F5;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#42A5F5;stop-opacity:0.2" />
     </linearGradient>
-    <!-- Checkerboard pattern for transparency -->
-    <pattern id="checkerboard" width="8" height="8" patternUnits="userSpaceOnUse">
-      <rect x="0" y="0" width="4" height="4" fill="#CCCCCC"/>
-      <rect x="4" y="4" width="4" height="4" fill="#CCCCCC"/>
-      <rect x="0" y="4" width="4" height="4" fill="#FFFFFF"/>
-      <rect x="4" y="0" width="4" height="4" fill="#FFFFFF"/>
-    </pattern>
   </defs>
-  <!-- Background with checkerboard -->
-  <rect x="6" y="14" width="52" height="36" rx="4" fill="url(#checkerboard)"/>
+  <!-- Background checkerboard pattern (inline rectangles instead of pattern reference) -->
+  <g>
+    <rect x="6" y="14" width="52" height="36" rx="4" fill="#FFFFFF"/>
+    <rect x="6" y="14" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="14" y="14" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="22" y="14" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="30" y="14" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="38" y="14" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="46" y="14" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="54" y="14" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="10" y="18" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="18" y="18" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="26" y="18" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="34" y="18" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="42" y="18" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="50" y="18" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="6" y="22" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="14" y="22" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="22" y="22" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="30" y="22" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="38" y="22" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="46" y="22" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="54" y="22" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="10" y="26" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="18" y="26" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="26" y="26" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="34" y="26" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="42" y="26" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="50" y="26" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="6" y="30" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="14" y="30" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="22" y="30" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="30" y="30" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="38" y="30" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="46" y="30" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="54" y="30" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="10" y="34" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="18" y="34" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="26" y="34" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="34" y="34" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="42" y="34" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="50" y="34" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="6" y="38" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="14" y="38" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="22" y="38" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="30" y="38" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="38" y="38" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="46" y="38" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="54" y="38" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="10" y="42" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="18" y="42" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="26" y="42" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="34" y="42" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="42" y="42" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="50" y="42" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="6" y="46" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="14" y="46" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="22" y="46" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="30" y="46" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="38" y="46" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="46" y="46" width="4" height="4" fill="#CCCCCC"/>
+    <rect x="54" y="46" width="4" height="4" fill="#CCCCCC"/>
+  </g>
   <!-- Gradient overlay showing transparency effect -->
   <rect x="6" y="14" width="52" height="36" rx="4" fill="url(#transGrad)"/>
   <!-- Frame -->
