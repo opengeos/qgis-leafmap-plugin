@@ -112,38 +112,50 @@ class SwipeMapItem(QgsMapCanvasItem):
 
         # Store original states
         if self.left_layer:
-            self._original_left_opacity = self.left_layer.opacity()
-            self._original_left_visible = (
-                QgsProject.instance()
-                .layerTreeRoot()
-                .findLayer(self.left_layer.id())
-                .isVisible()
-                if QgsProject.instance().layerTreeRoot().findLayer(self.left_layer.id())
-                else True
-            )
+            try:
+                self._original_left_opacity = self.left_layer.opacity()
+                layer_tree_layer = (
+                    QgsProject.instance()
+                    .layerTreeRoot()
+                    .findLayer(self.left_layer.id())
+                )
+                self._original_left_visible = (
+                    layer_tree_layer.isVisible() if layer_tree_layer else True
+                )
+            except (RuntimeError, AttributeError):
+                self._original_left_opacity = 1.0
+                self._original_left_visible = True
 
         if self.right_layer:
-            self._original_right_opacity = self.right_layer.opacity()
-            self._original_right_visible = (
-                QgsProject.instance()
-                .layerTreeRoot()
-                .findLayer(self.right_layer.id())
-                .isVisible()
-                if QgsProject.instance()
-                .layerTreeRoot()
-                .findLayer(self.right_layer.id())
-                else True
-            )
+            try:
+                self._original_right_opacity = self.right_layer.opacity()
+                layer_tree_layer = (
+                    QgsProject.instance()
+                    .layerTreeRoot()
+                    .findLayer(self.right_layer.id())
+                )
+                self._original_right_visible = (
+                    layer_tree_layer.isVisible() if layer_tree_layer else True
+                )
+            except (RuntimeError, AttributeError):
+                self._original_right_opacity = 1.0
+                self._original_right_visible = True
 
         # Make left layer visible and fully opaque
         self._set_layer_visible(self.left_layer, True)
         if self.left_layer:
-            self.left_layer.setOpacity(1.0)
+            try:
+                self.left_layer.setOpacity(1.0)
+            except (RuntimeError, AttributeError):
+                pass
 
         # Hide right layer from normal rendering - we'll render it ourselves with clipping
         self._set_layer_visible(self.right_layer, False)
         if self.right_layer:
-            self.right_layer.setOpacity(1.0)
+            try:
+                self.right_layer.setOpacity(1.0)
+            except (RuntimeError, AttributeError):
+                pass
 
         # Connect to canvas extent changed for re-rendering
         if not self._connected:
@@ -164,10 +176,16 @@ class SwipeMapItem(QgsMapCanvasItem):
 
         # Restore original opacities
         if self.left_layer and self._original_left_opacity is not None:
-            self.left_layer.setOpacity(self._original_left_opacity)
+            try:
+                self.left_layer.setOpacity(self._original_left_opacity)
+            except (RuntimeError, AttributeError):
+                pass
 
         if self.right_layer and self._original_right_opacity is not None:
-            self.right_layer.setOpacity(self._original_right_opacity)
+            try:
+                self.right_layer.setOpacity(self._original_right_opacity)
+            except (RuntimeError, AttributeError):
+                pass
 
         # Restore original visibility for right layer
         if self.right_layer and self._original_right_visible is not None:
@@ -188,9 +206,13 @@ class SwipeMapItem(QgsMapCanvasItem):
     def _set_layer_visible(self, layer, visible):
         """Set layer visibility in layer tree."""
         if layer:
-            tree_layer = QgsProject.instance().layerTreeRoot().findLayer(layer.id())
-            if tree_layer:
-                tree_layer.setItemVisibilityChecked(visible)
+            try:
+                tree_layer = QgsProject.instance().layerTreeRoot().findLayer(layer.id())
+                if tree_layer:
+                    tree_layer.setItemVisibilityChecked(visible)
+            except (RuntimeError, AttributeError):
+                # Layer is invalid or removed
+                pass
 
     def _on_extent_changed(self):
         """Handle canvas extent change."""
@@ -497,11 +519,31 @@ class SwipeDockWidget(QDockWidget):
         self.swipe_tool = SwipeMapTool(self.canvas, self.swipe_item, self, self)
 
         self._setup_ui()
+
+        # Connect to layer changes BEFORE populating
+        self._connect_project_signals()
+
+        # Initial population
         self._populate_layers()
 
-        # Connect to layer changes
-        QgsProject.instance().layersAdded.connect(self._on_layers_changed)
-        QgsProject.instance().layersRemoved.connect(self._on_layers_changed)
+    def _connect_project_signals(self):
+        """Connect to project signals for layer changes."""
+        project = QgsProject.instance()
+
+        # Disconnect any existing connections first
+        try:
+            project.layersAdded.disconnect(self._on_layers_changed)
+        except (RuntimeError, TypeError):
+            pass
+
+        try:
+            project.layersRemoved.disconnect(self._on_layers_changed)
+        except (RuntimeError, TypeError):
+            pass
+
+        # Connect signals
+        project.layersAdded.connect(self._on_layers_changed)
+        project.layersRemoved.connect(self._on_layers_changed)
 
     def _setup_ui(self):
         """Set up the dock widget UI."""
@@ -648,11 +690,20 @@ class SwipeDockWidget(QDockWidget):
         separator.setFrameShadow(QFrame.Sunken)
         layout.addWidget(separator)
 
-        # Swap layers button
-        self.swap_btn = QPushButton("↔ Swap Layers")
+        # Additional controls
+        controls_layout2 = QHBoxLayout()
+
+        self.refresh_btn = QPushButton("Refresh Layers")
+        self.refresh_btn.setToolTip("Refresh layer list")
+        self.refresh_btn.clicked.connect(self._populate_layers)
+        controls_layout2.addWidget(self.refresh_btn)
+
+        self.swap_btn = QPushButton("Swap Layers")
         self.swap_btn.setToolTip("Swap left and right layers")
         self.swap_btn.clicked.connect(self._swap_layers)
-        layout.addWidget(self.swap_btn)
+        controls_layout2.addWidget(self.swap_btn)
+
+        layout.addLayout(controls_layout2)
 
         # Stretch at the end
         layout.addStretch()
@@ -677,27 +728,64 @@ class SwipeDockWidget(QDockWidget):
         self.right_layer_combo.addItem("-- Select Layer --", None)
 
         layers = QgsProject.instance().mapLayers().values()
+        available_layer_ids = set()
+
         for layer in layers:
             self.left_layer_combo.addItem(layer.name(), layer.id())
             self.right_layer_combo.addItem(layer.name(), layer.id())
+            available_layer_ids.add(layer.id())
+
+        # Check if currently selected layers still exist
+        left_exists = current_left in available_layer_ids if current_left else False
+        right_exists = current_right in available_layer_ids if current_right else False
 
         # Restore selection if possible
-        if current_left:
+        if current_left and left_exists:
             idx = self.left_layer_combo.findData(current_left)
             if idx >= 0:
                 self.left_layer_combo.setCurrentIndex(idx)
+        else:
+            # Layer was removed, clear swipe_item reference
+            if self.swipe_item.left_layer:
+                try:
+                    layer_id = self.swipe_item.left_layer.id()
+                    if layer_id not in available_layer_ids:
+                        self.swipe_item.set_left_layer(None)
+                except (RuntimeError, AttributeError):
+                    # Layer is invalid, clear it
+                    self.swipe_item.set_left_layer(None)
 
-        if current_right:
+        if current_right and right_exists:
             idx = self.right_layer_combo.findData(current_right)
             if idx >= 0:
                 self.right_layer_combo.setCurrentIndex(idx)
+        else:
+            # Layer was removed, clear swipe_item reference
+            if self.swipe_item.right_layer:
+                try:
+                    layer_id = self.swipe_item.right_layer.id()
+                    if layer_id not in available_layer_ids:
+                        self.swipe_item.set_right_layer(None)
+                except (RuntimeError, AttributeError):
+                    # Layer is invalid, clear it
+                    self.swipe_item.set_right_layer(None)
+
+        # If swipe is active and a layer was removed, deactivate it
+        if self.swipe_item.is_active:
+            if not left_exists or not right_exists:
+                self.activate_btn.setChecked(False)
+                self._on_activate_clicked(False)
+                self.status_label.setText("Swipe deactivated - layer was removed")
+                self.status_label.setStyleSheet("color: orange; font-size: 10px;")
 
         self.left_layer_combo.blockSignals(False)
         self.right_layer_combo.blockSignals(False)
 
     def _on_layers_changed(self, *args):
         """Handle layer changes in the project."""
+        # Force immediate refresh
         self._populate_layers()
+        self.update()
 
     def _on_left_layer_changed(self, index):
         """Handle left layer selection change."""
@@ -810,6 +898,13 @@ class SwipeDockWidget(QDockWidget):
         else:
             self.status_label.setText("Ready - click Activate Swipe")
             self.status_label.setStyleSheet("color: gray; font-size: 10px;")
+
+    def showEvent(self, event):
+        """Handle dock widget show event - refresh layers when shown."""
+        super().showEvent(event)
+        # Reconnect signals and refresh when shown
+        self._connect_project_signals()
+        self._populate_layers()
 
     def cleanup(self):
         """Clean up resources when dock is closed."""

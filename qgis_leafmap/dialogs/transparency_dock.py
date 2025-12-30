@@ -78,14 +78,18 @@ class LayerTransparencyWidget(QWidget):
 
     def _update_from_layer(self):
         """Update widget values from the layer's current transparency."""
-        opacity = self.layer.opacity()
-        transparency = int((1.0 - opacity) * 100)
-        self.slider.blockSignals(True)
-        self.spinbox.blockSignals(True)
-        self.slider.setValue(transparency)
-        self.spinbox.setValue(transparency)
-        self.slider.blockSignals(False)
-        self.spinbox.blockSignals(False)
+        try:
+            opacity = self.layer.opacity()
+            transparency = int((1.0 - opacity) * 100)
+            self.slider.blockSignals(True)
+            self.spinbox.blockSignals(True)
+            self.slider.setValue(transparency)
+            self.spinbox.setValue(transparency)
+            self.slider.blockSignals(False)
+            self.spinbox.blockSignals(False)
+        except (RuntimeError, AttributeError):
+            # Layer is no longer valid
+            pass
 
     def _on_slider_changed(self, value):
         """Handle slider value change."""
@@ -107,9 +111,13 @@ class LayerTransparencyWidget(QWidget):
         Args:
             transparency: Transparency percentage (0-100).
         """
-        opacity = 1.0 - (transparency / 100.0)
-        self.layer.setOpacity(opacity)
-        self.layer.triggerRepaint()
+        try:
+            opacity = 1.0 - (transparency / 100.0)
+            self.layer.setOpacity(opacity)
+            self.layer.triggerRepaint()
+        except (RuntimeError, AttributeError):
+            # Layer is no longer valid
+            pass
 
 
 class TransparencyDockWidget(QDockWidget):
@@ -129,14 +137,39 @@ class TransparencyDockWidget(QDockWidget):
         self.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
 
         self._setup_ui()
+
+        # Connect to layer changes BEFORE populating
+        self._connect_project_signals()
+
+        # Initial population
         self._populate_layers()
 
-        # Connect to layer changes
-        QgsProject.instance().layersAdded.connect(self._on_layers_added)
-        QgsProject.instance().layersRemoved.connect(self._on_layers_removed)
-        QgsProject.instance().layerTreeRoot().visibilityChanged.connect(
-            self._on_visibility_changed
-        )
+    def _connect_project_signals(self):
+        """Connect to project signals for layer changes."""
+        project = QgsProject.instance()
+
+        # Disconnect any existing connections first
+        try:
+            project.layersAdded.disconnect(self._on_layers_added)
+        except (RuntimeError, TypeError):
+            pass
+
+        try:
+            project.layersRemoved.disconnect(self._on_layers_removed)
+        except (RuntimeError, TypeError):
+            pass
+
+        try:
+            project.layerTreeRoot().visibilityChanged.disconnect(
+                self._on_visibility_changed
+            )
+        except (RuntimeError, TypeError):
+            pass
+
+        # Connect signals
+        project.layersAdded.connect(self._on_layers_added)
+        project.layersRemoved.connect(self._on_layers_removed)
+        project.layerTreeRoot().visibilityChanged.connect(self._on_visibility_changed)
 
     def _setup_ui(self):
         """Set up the dock widget UI."""
@@ -206,6 +239,11 @@ class TransparencyDockWidget(QDockWidget):
         actions_group = QGroupBox("Quick Actions")
         actions_layout = QHBoxLayout(actions_group)
 
+        self.refresh_btn = QPushButton("Refresh")
+        self.refresh_btn.setToolTip("Refresh layer list")
+        self.refresh_btn.clicked.connect(self._populate_layers)
+        actions_layout.addWidget(self.refresh_btn)
+
         self.reset_all_btn = QPushButton("Reset All")
         self.reset_all_btn.setToolTip("Reset all layers to 0% transparency")
         self.reset_all_btn.clicked.connect(self._reset_all)
@@ -238,11 +276,27 @@ class TransparencyDockWidget(QDockWidget):
         layer_type = self.layer_type_combo.currentData()
         visible_only = self.visible_only_combo.currentData()
 
-        # Get layers
-        layers = QgsProject.instance().mapLayers().values()
+        # Get layers from project
+        try:
+            layers = list(QgsProject.instance().mapLayers().values())
+        except (RuntimeError, AttributeError):
+            layers = []
+
         layer_count = 0
 
         for layer in layers:
+            # Skip invalid layers
+            if layer is None:
+                continue
+
+            try:
+                # Verify layer is still valid
+                layer_id = layer.id()
+                layer_name = layer.name()
+            except (RuntimeError, AttributeError):
+                # Layer is no longer valid, skip it
+                continue
+
             # Apply type filter
             if layer_type == "raster" and not isinstance(layer, QgsRasterLayer):
                 continue
@@ -251,26 +305,37 @@ class TransparencyDockWidget(QDockWidget):
 
             # Apply visibility filter
             if visible_only:
-                layer_tree = QgsProject.instance().layerTreeRoot()
-                tree_layer = layer_tree.findLayer(layer.id())
-                if tree_layer and not tree_layer.isVisible():
+                try:
+                    layer_tree = QgsProject.instance().layerTreeRoot()
+                    tree_layer = layer_tree.findLayer(layer_id)
+                    if tree_layer and not tree_layer.isVisible():
+                        continue
+                except (RuntimeError, AttributeError):
                     continue
 
             # Create widget for this layer
-            widget = LayerTransparencyWidget(layer, self)
-            self.layers_layout.insertWidget(layer_count, widget)
-            self.layer_widgets[layer.id()] = widget
-            layer_count += 1
+            try:
+                widget = LayerTransparencyWidget(layer, self)
+                self.layers_layout.insertWidget(layer_count, widget)
+                self.layer_widgets[layer_id] = widget
+                layer_count += 1
+            except (RuntimeError, AttributeError):
+                # Failed to create widget for this layer, skip it
+                continue
 
         self.status_label.setText(f"{layer_count} layer(s) shown")
 
     def _on_layers_added(self, layers):
         """Handle new layers being added."""
+        # Force immediate refresh
         self._populate_layers()
+        self.update()
 
     def _on_layers_removed(self, layer_ids):
         """Handle layers being removed."""
+        # Force immediate refresh
         self._populate_layers()
+        self.update()
 
     def _on_visibility_changed(self, *args):
         """Handle layer visibility change."""
@@ -288,6 +353,13 @@ class TransparencyDockWidget(QDockWidget):
         for widget in self.layer_widgets.values():
             widget.slider.setValue(50)
         self.status_label.setText("All layers set to 50%")
+
+    def showEvent(self, event):
+        """Handle dock widget show event - refresh layers when shown."""
+        super().showEvent(event)
+        # Reconnect signals and refresh when shown
+        self._connect_project_signals()
+        self._populate_layers()
 
     def closeEvent(self, event):
         """Handle dock widget close event."""

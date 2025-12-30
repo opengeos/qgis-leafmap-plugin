@@ -2,7 +2,7 @@
 name=Leafmap
 qgisMinimumVersion=3.28
 description=A QGIS plugin for interactive layer comparison with transparency control and swipe tools.
-version=0.1.0
+version=0.2.0
 author=Qiusheng Wu
 email=giswqs@gmail.com
 
@@ -33,6 +33,8 @@ experimental=False
 deprecated=False
 
 changelog=
+    0.2.0
+        - Fix layer refresh issue when using swipe tool
     0.1.0 - Initial release
         - Layer transparency control with interactive slider
         - Swipe tool for comparing layers (split view)
