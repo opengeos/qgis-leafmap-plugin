@@ -2,6 +2,8 @@
 
 A powerful QGIS plugin for interactive layer visualization and comparison, inspired by the [leafmap](https://github.com/opengeos/leafmap) Python package.
 
+![](https://github.com/user-attachments/assets/082acb93-b954-4321-83cf-ff2af3356e9b)
+
 ## Features
 
 - **Layer Transparency Control**: Interactive slider to adjust layer transparency in real-time for all loaded layers
@@ -15,8 +17,12 @@ A powerful QGIS plugin for interactive layer visualization and comparison, inspi
 ### Layer Transparency Panel
 Control the transparency of all layers with individual sliders. Filter by layer type (raster/vector) and visibility.
 
+![](https://github.com/user-attachments/assets/f431f51e-0584-4a1a-88d2-b9cd32a1eefc)
+
 ### Layer Swipe Tool
 Compare two layers by swiping between them. Select left and right layers, choose vertical or horizontal orientation, and drag the divider on the map.
+
+![](https://github.com/user-attachments/assets/303755af-ed5b-4105-ac85-795f0bc7e750)
 
 ## Project Structure
 
@@ -215,10 +221,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
-
-## Author
-
-- **Qiusheng Wu** - [GitHub](https://github.com/giswqs)
 
 ## Links
 
