@@ -24,34 +24,13 @@ Compare two layers by swiping between them. Select left and right layers, choose
 
 ![](https://github.com/user-attachments/assets/303755af-ed5b-4105-ac85-795f0bc7e750)
 
-## Project Structure
+## Video Tutorial
 
-```
-qgis-leafmap-plugin/
-├── qgis_leafmap/
-│   ├── __init__.py              # Plugin entry point
-│   ├── qgis_leafmap.py          # Main plugin class
-│   ├── metadata.txt             # Plugin metadata for QGIS
-│   ├── LICENSE                  # Plugin license
-│   ├── dialogs/
-│   │   ├── __init__.py
-│   │   ├── transparency_dock.py # Layer transparency panel
-│   │   ├── swipe_dock.py        # Layer swipe/comparison tool
-│   │   ├── settings_dock.py     # Settings panel
-│   │   └── update_checker.py    # Update checker dialog
-│   └── icons/
-│       ├── icon.svg             # Main plugin icon
-│       ├── transparency.svg     # Transparency tool icon
-│       ├── swipe.svg            # Swipe tool icon
-│       ├── settings.svg         # Settings icon
-│       └── about.svg            # About icon
-├── package_plugin.py            # Python packaging script
-├── package_plugin.sh            # Bash packaging script
-├── install.py                   # Python installation script
-├── install.sh                   # Bash installation script
-├── README.md                    # This file
-└── LICENSE                      # Repository license
-```
+👉 [Compare Layers Visually in QGIS — New Leafmap Plugin Demo!](https://youtu.be/glBgnyS8IDY)
+
+[![Leafmap QGIS Plugin](https://github.com/user-attachments/assets/c6468f4e-4fbf-4f29-865f-041dcd13d9d4)](https://youtu.be/glBgnyS8IDY)
+
+
 
 ## Requirements
 
@@ -141,6 +120,35 @@ Copy the `qgis_leafmap` folder to your QGIS plugins directory:
 2. Click **Check for Updates** to see if a new version is available
 3. If an update is available, click **Download and Install Update**
 4. Restart QGIS to apply the update
+
+## Project Structure
+
+```
+qgis-leafmap-plugin/
+├── qgis_leafmap/
+│   ├── __init__.py              # Plugin entry point
+│   ├── qgis_leafmap.py          # Main plugin class
+│   ├── metadata.txt             # Plugin metadata for QGIS
+│   ├── LICENSE                  # Plugin license
+│   ├── dialogs/
+│   │   ├── __init__.py
+│   │   ├── transparency_dock.py # Layer transparency panel
+│   │   ├── swipe_dock.py        # Layer swipe/comparison tool
+│   │   ├── settings_dock.py     # Settings panel
+│   │   └── update_checker.py    # Update checker dialog
+│   └── icons/
+│       ├── icon.svg             # Main plugin icon
+│       ├── transparency.svg     # Transparency tool icon
+│       ├── swipe.svg            # Swipe tool icon
+│       ├── settings.svg         # Settings icon
+│       └── about.svg            # About icon
+├── package_plugin.py            # Python packaging script
+├── package_plugin.sh            # Bash packaging script
+├── install.py                   # Python installation script
+├── install.sh                   # Bash installation script
+├── README.md                    # This file
+└── LICENSE                      # Repository license
+```
 
 ## Development
 
