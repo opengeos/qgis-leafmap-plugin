@@ -8,10 +8,12 @@ from .transparency_dock import TransparencyDockWidget
 from .swipe_dock import SwipeDockWidget
 from .settings_dock import SettingsDockWidget
 from .update_checker import UpdateCheckerDialog
+from .code_editor_dock import CodeEditorDockWidget
 
 __all__ = [
     "TransparencyDockWidget",
     "SwipeDockWidget",
     "SettingsDockWidget",
     "UpdateCheckerDialog",
+    "CodeEditorDockWidget",
 ]

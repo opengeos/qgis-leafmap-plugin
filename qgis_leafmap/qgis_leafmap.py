@@ -32,6 +32,7 @@ class QgisLeafmap:
         self._transparency_dock = None
         self._swipe_dock = None
         self._settings_dock = None
+        self._code_editor_dock = None
 
     def add_action(
         self,
@@ -114,6 +115,11 @@ class QgisLeafmap:
         if not os.path.exists(about_icon):
             about_icon = ":/images/themes/default/mActionHelpContents.svg"
 
+        # Code Editor icon
+        code_editor_icon = os.path.join(icon_base, "code_editor.svg")
+        if not os.path.exists(code_editor_icon):
+            code_editor_icon = ":/images/themes/default/mIconPythonFile.svg"
+
         # Add Transparency Panel action (checkable for dock toggle)
         self.transparency_action = self.add_action(
             transparency_icon,
@@ -130,6 +136,16 @@ class QgisLeafmap:
             "Layer Swipe",
             self.toggle_swipe_dock,
             status_tip="Toggle Layer Swipe Panel for comparing layers",
+            checkable=True,
+            parent=self.iface.mainWindow(),
+        )
+
+        # Add Python Editor action (checkable for dock toggle)
+        self.code_editor_action = self.add_action(
+            code_editor_icon,
+            "Python Editor",
+            self.toggle_code_editor_dock,
+            status_tip="Toggle Python Code Editor",
             checkable=True,
             parent=self.iface.mainWindow(),
         )
@@ -192,6 +208,11 @@ class QgisLeafmap:
             self.iface.removeDockWidget(self._settings_dock)
             self._settings_dock.deleteLater()
             self._settings_dock = None
+
+        if self._code_editor_dock:
+            self.iface.removeDockWidget(self._code_editor_dock)
+            self._code_editor_dock.deleteLater()
+            self._code_editor_dock = None
 
         # Remove actions from menu
         for action in self.actions:
@@ -318,6 +339,44 @@ class QgisLeafmap:
     def _on_settings_visibility_changed(self, visible):
         """Handle Settings dock visibility change."""
         self.settings_action.setChecked(visible)
+
+    def toggle_code_editor_dock(self):
+        """Toggle the Python Editor dock widget visibility."""
+        if self._code_editor_dock is None:
+            try:
+                from .dialogs.code_editor_dock import CodeEditorDockWidget
+
+                self._code_editor_dock = CodeEditorDockWidget(
+                    self.iface, self.iface.mainWindow()
+                )
+                self._code_editor_dock.setObjectName("LeafmapCodeEditorDock")
+                self._code_editor_dock.visibilityChanged.connect(
+                    self._on_code_editor_visibility_changed
+                )
+                self.iface.addDockWidget(Qt.RightDockWidgetArea, self._code_editor_dock)
+                self._code_editor_dock.show()
+                self._code_editor_dock.raise_()
+                return
+
+            except Exception as e:
+                QMessageBox.critical(
+                    self.iface.mainWindow(),
+                    "Error",
+                    f"Failed to create Code Editor panel:\n{str(e)}",
+                )
+                self.code_editor_action.setChecked(False)
+                return
+
+        # Toggle visibility
+        if self._code_editor_dock.isVisible():
+            self._code_editor_dock.hide()
+        else:
+            self._code_editor_dock.show()
+            self._code_editor_dock.raise_()
+
+    def _on_code_editor_visibility_changed(self, visible):
+        """Handle Code Editor dock visibility change."""
+        self.code_editor_action.setChecked(visible)
 
     def show_about(self):
         """Display the about dialog."""
