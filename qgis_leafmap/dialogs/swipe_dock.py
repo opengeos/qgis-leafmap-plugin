@@ -663,8 +663,7 @@ class SwipeDockWidget(QDockWidget):
 
         self.activate_btn = QPushButton("Activate Swipe")
         self.activate_btn.setCheckable(True)
-        self.activate_btn.setStyleSheet(
-            """
+        self.activate_btn.setStyleSheet("""
             QPushButton {
                 background-color: #4CAF50;
                 color: white;
@@ -677,8 +676,7 @@ class SwipeDockWidget(QDockWidget):
             QPushButton:hover {
                 opacity: 0.8;
             }
-        """
-        )
+        """)
         self.activate_btn.clicked.connect(self._on_activate_clicked)
         control_layout.addWidget(self.activate_btn)
 
