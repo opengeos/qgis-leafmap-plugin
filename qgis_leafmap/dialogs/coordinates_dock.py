@@ -252,8 +252,7 @@ class CoordinatesDockWidget(QDockWidget):
         # Click mode toggle button
         self.click_mode_btn = QPushButton("Activate Click Mode")
         self.click_mode_btn.setCheckable(True)
-        self.click_mode_btn.setStyleSheet(
-            """
+        self.click_mode_btn.setStyleSheet("""
             QPushButton {
                 background-color: #4CAF50;
                 color: white;
@@ -263,8 +262,7 @@ class CoordinatesDockWidget(QDockWidget):
             QPushButton:checked {
                 background-color: #f44336;
             }
-        """
-        )
+        """)
         self.click_mode_btn.clicked.connect(self._toggle_click_mode)
         point_layout.addWidget(self.click_mode_btn)
 
@@ -331,8 +329,7 @@ class CoordinatesDockWidget(QDockWidget):
 
         self.bbox_mode_btn = QPushButton("Draw Bounding Box")
         self.bbox_mode_btn.setCheckable(True)
-        self.bbox_mode_btn.setStyleSheet(
-            """
+        self.bbox_mode_btn.setStyleSheet("""
             QPushButton {
                 background-color: #2196F3;
                 color: white;
@@ -342,8 +339,7 @@ class CoordinatesDockWidget(QDockWidget):
             QPushButton:checked {
                 background-color: #f44336;
             }
-        """
-        )
+        """)
         self.bbox_mode_btn.clicked.connect(self._toggle_bbox_mode)
         bbox_layout.addWidget(self.bbox_mode_btn)
 
