@@ -9,6 +9,7 @@ from .swipe_dock import SwipeDockWidget
 from .settings_dock import SettingsDockWidget
 from .update_checker import UpdateCheckerDialog
 from .code_editor_dock import CodeEditorDockWidget
+from .coordinates_dock import CoordinatesDockWidget
 
 __all__ = [
     "TransparencyDockWidget",
@@ -16,4 +17,5 @@ __all__ = [
     "SettingsDockWidget",
     "UpdateCheckerDialog",
     "CodeEditorDockWidget",
+    "CoordinatesDockWidget",
 ]
