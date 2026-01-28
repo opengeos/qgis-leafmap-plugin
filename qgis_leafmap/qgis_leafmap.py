@@ -33,6 +33,7 @@ class QgisLeafmap:
         self._swipe_dock = None
         self._settings_dock = None
         self._code_editor_dock = None
+        self._coordinates_dock = None
 
     def add_action(
         self,
@@ -150,6 +151,21 @@ class QgisLeafmap:
             parent=self.iface.mainWindow(),
         )
 
+        # Coordinates icon
+        coordinates_icon = os.path.join(icon_base, "coordinates.svg")
+        if not os.path.exists(coordinates_icon):
+            coordinates_icon = ":/images/themes/default/mActionMapTips.svg"
+
+        # Add Coordinate Retrieval action (checkable for dock toggle)
+        self.coordinates_action = self.add_action(
+            coordinates_icon,
+            "Coordinate Retrieval",
+            self.toggle_coordinates_dock,
+            status_tip="Toggle Coordinate Retrieval Panel",
+            checkable=True,
+            parent=self.iface.mainWindow(),
+        )
+
         # Add Settings Panel action (checkable for dock toggle)
         self.settings_action = self.add_action(
             settings_icon,
@@ -213,6 +229,15 @@ class QgisLeafmap:
             self.iface.removeDockWidget(self._code_editor_dock)
             self._code_editor_dock.deleteLater()
             self._code_editor_dock = None
+
+        if self._coordinates_dock:
+            try:
+                self._coordinates_dock.cleanup()
+            except Exception:
+                pass
+            self.iface.removeDockWidget(self._coordinates_dock)
+            self._coordinates_dock.deleteLater()
+            self._coordinates_dock = None
 
         # Remove actions from menu
         for action in self.actions:
@@ -377,6 +402,44 @@ class QgisLeafmap:
     def _on_code_editor_visibility_changed(self, visible):
         """Handle Code Editor dock visibility change."""
         self.code_editor_action.setChecked(visible)
+
+    def toggle_coordinates_dock(self):
+        """Toggle the Coordinate Retrieval dock widget visibility."""
+        if self._coordinates_dock is None:
+            try:
+                from .dialogs.coordinates_dock import CoordinatesDockWidget
+
+                self._coordinates_dock = CoordinatesDockWidget(
+                    self.iface, self.iface.mainWindow()
+                )
+                self._coordinates_dock.setObjectName("LeafmapCoordinatesDock")
+                self._coordinates_dock.visibilityChanged.connect(
+                    self._on_coordinates_visibility_changed
+                )
+                self.iface.addDockWidget(Qt.RightDockWidgetArea, self._coordinates_dock)
+                self._coordinates_dock.show()
+                self._coordinates_dock.raise_()
+                return
+
+            except Exception as e:
+                QMessageBox.critical(
+                    self.iface.mainWindow(),
+                    "Error",
+                    f"Failed to create Coordinate Retrieval panel:\n{str(e)}",
+                )
+                self.coordinates_action.setChecked(False)
+                return
+
+        # Toggle visibility
+        if self._coordinates_dock.isVisible():
+            self._coordinates_dock.hide()
+        else:
+            self._coordinates_dock.show()
+            self._coordinates_dock.raise_()
+
+    def _on_coordinates_visibility_changed(self, visible):
+        """Handle Coordinates dock visibility change."""
+        self.coordinates_action.setChecked(visible)
 
     def show_about(self):
         """Display the about dialog."""
