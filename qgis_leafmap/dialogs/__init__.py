@@ -10,6 +10,7 @@ from .settings_dock import SettingsDockWidget
 from .update_checker import UpdateCheckerDialog
 from .code_editor_dock import CodeEditorDockWidget
 from .coordinates_dock import CoordinatesDockWidget
+from .export_dock import ExportDockWidget
 
 __all__ = [
     "TransparencyDockWidget",
@@ -18,4 +19,5 @@ __all__ = [
     "UpdateCheckerDialog",
     "CodeEditorDockWidget",
     "CoordinatesDockWidget",
+    "ExportDockWidget",
 ]

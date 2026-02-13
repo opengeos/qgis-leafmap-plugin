@@ -34,6 +34,7 @@ class QgisLeafmap:
         self._settings_dock = None
         self._code_editor_dock = None
         self._coordinates_dock = None
+        self._export_dock = None
 
     def add_action(
         self,
@@ -156,12 +157,27 @@ class QgisLeafmap:
         if not os.path.exists(coordinates_icon):
             coordinates_icon = ":/images/themes/default/mActionMapTips.svg"
 
+        # Export icon
+        export_icon = os.path.join(icon_base, "export.svg")
+        if not os.path.exists(export_icon):
+            export_icon = ":/images/themes/default/mActionFileSaveAs.svg"
+
         # Add Coordinate Retrieval action (checkable for dock toggle)
         self.coordinates_action = self.add_action(
             coordinates_icon,
             "Coordinate Retrieval",
             self.toggle_coordinates_dock,
             status_tip="Toggle Coordinate Retrieval Panel",
+            checkable=True,
+            parent=self.iface.mainWindow(),
+        )
+
+        # Add Export Layer action (checkable for dock toggle)
+        self.export_action = self.add_action(
+            export_icon,
+            "Export Layer",
+            self.toggle_export_dock,
+            status_tip="Toggle Export Layer Panel",
             checkable=True,
             parent=self.iface.mainWindow(),
         )
@@ -238,6 +254,15 @@ class QgisLeafmap:
             self.iface.removeDockWidget(self._coordinates_dock)
             self._coordinates_dock.deleteLater()
             self._coordinates_dock = None
+
+        if self._export_dock:
+            try:
+                self._export_dock.cleanup()
+            except Exception:
+                pass
+            self.iface.removeDockWidget(self._export_dock)
+            self._export_dock.deleteLater()
+            self._export_dock = None
 
         # Remove actions from menu
         for action in self.actions:
@@ -440,6 +465,43 @@ class QgisLeafmap:
     def _on_coordinates_visibility_changed(self, visible):
         """Handle Coordinates dock visibility change."""
         self.coordinates_action.setChecked(visible)
+
+    def toggle_export_dock(self):
+        """Toggle the Export Layer dock widget visibility."""
+        if self._export_dock is None:
+            try:
+                from .dialogs.export_dock import ExportDockWidget
+
+                self._export_dock = ExportDockWidget(
+                    self.iface, self.iface.mainWindow()
+                )
+                self._export_dock.setObjectName("LeafmapExportDock")
+                self._export_dock.visibilityChanged.connect(
+                    self._on_export_visibility_changed
+                )
+                self.iface.addDockWidget(Qt.RightDockWidgetArea, self._export_dock)
+                self._export_dock.show()
+                self._export_dock.raise_()
+                return
+
+            except Exception as e:
+                QMessageBox.critical(
+                    self.iface.mainWindow(),
+                    "Error",
+                    f"Failed to create Export Layer panel:\n{str(e)}",
+                )
+                self.export_action.setChecked(False)
+                return
+
+        if self._export_dock.isVisible():
+            self._export_dock.hide()
+        else:
+            self._export_dock.show()
+            self._export_dock.raise_()
+
+    def _on_export_visibility_changed(self, visible):
+        """Handle Export dock visibility change."""
+        self.export_action.setChecked(visible)
 
     def show_about(self):
         """Display the about dialog."""
