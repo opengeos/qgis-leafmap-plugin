@@ -275,9 +275,11 @@ for layer_id, layer in layers.items():
     def eventFilter(self, obj, event):
         """Event filter to catch keyboard shortcuts in the editor."""
         if obj == self.editor and event.type() == QEvent.Type.KeyPress:
-            # Check for Ctrl+/ (comment toggle)
+            # Check for Ctrl+/ (comment toggle). Use bitwise check so the
+            # shortcut still triggers on layouts where typing "/" requires
+            # additional modifiers (e.g. Shift on some keyboards).
             if (
-                event.modifiers() == Qt.KeyboardModifier.ControlModifier
+                event.modifiers() & Qt.KeyboardModifier.ControlModifier
                 and event.key() == Qt.Key.Key_Slash
             ):
                 self._toggle_comment()

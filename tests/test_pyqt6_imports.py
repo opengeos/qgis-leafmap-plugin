@@ -6,10 +6,13 @@ PyQt6 during class-body evaluation.
 
 The plugin package is auto-discovered: the first sibling directory of
 ``tests/`` that contains a ``metadata.txt`` is treated as the plugin root,
-so this file does not need to be edited per-plugin.
+so this file does not need to be edited per-plugin. In a mono-repo with
+multiple plugins, set the ``QGIS_PLUGIN_ROOT`` environment variable to the
+package directory you want to test.
 """
 
 import importlib
+import os
 import pathlib
 
 import pytest
@@ -19,6 +22,15 @@ REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 def _find_plugin_root() -> pathlib.Path:
     """Return the plugin package directory (the one with metadata.txt)."""
+    override = os.environ.get("QGIS_PLUGIN_ROOT")
+    if override:
+        path = pathlib.Path(override).resolve()
+        if not (path / "metadata.txt").is_file():
+            raise RuntimeError(
+                f"QGIS_PLUGIN_ROOT={override!r} does not contain a metadata.txt."
+            )
+        return path
+
     candidates = [
         p.parent for p in REPO_ROOT.glob("*/metadata.txt") if p.parent.name != "tests"
     ]
@@ -30,7 +42,8 @@ def _find_plugin_root() -> pathlib.Path:
     if len(candidates) > 1:
         raise RuntimeError(
             f"Multiple plugin packages found under {REPO_ROOT}: {candidates}. "
-            "Set PLUGIN_ROOT explicitly in this file."
+            "Set the QGIS_PLUGIN_ROOT environment variable to the package "
+            "directory you want to test."
         )
     return candidates[0]
 
