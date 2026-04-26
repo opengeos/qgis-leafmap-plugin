@@ -241,8 +241,8 @@ class SwipeMapItem(QgsMapCanvasItem):
                 return
 
             # Create image for rendering
-            image = QImage(width, height, QImage.Format_ARGB32_Premultiplied)
-            image.fill(Qt.transparent)
+            image = QImage(width, height, QImage.Format.Format_ARGB32_Premultiplied)
+            image.fill(Qt.GlobalColor.transparent)
 
             # Set up map settings for rendering just the right layer
             settings = QgsMapSettings()
@@ -250,7 +250,7 @@ class SwipeMapItem(QgsMapCanvasItem):
             settings.setExtent(self.canvas.extent())
             settings.setDestinationCrs(self.canvas.mapSettings().destinationCrs())
             settings.setLayers([self.right_layer])
-            settings.setBackgroundColor(QColor(Qt.transparent))
+            settings.setBackgroundColor(QColor(Qt.GlobalColor.transparent))
             settings.setFlag(QgsMapSettings.Antialiasing, True)
             settings.setFlag(QgsMapSettings.DrawLabeling, True)
 
@@ -258,7 +258,7 @@ class SwipeMapItem(QgsMapCanvasItem):
             painter = QPainter()
             if painter.begin(image):
                 try:
-                    painter.setRenderHint(QPainter.Antialiasing, True)
+                    painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
                     job = QgsMapRendererCustomPainterJob(settings, painter)
                     job.start()
                     job.waitForFinished()
@@ -421,37 +421,39 @@ class SwipeMapTool(QObject):
             return False
 
         try:
-            if event.type() == QEvent.MouseButtonPress:
-                if event.button() == Qt.LeftButton:
+            if event.type() == QEvent.Type.MouseButtonPress:
+                if event.button() == Qt.MouseButton.LeftButton:
                     if self._is_on_divider(event.pos()):
                         self._is_dragging = True
                         self.canvas.viewport().setCursor(
-                            Qt.SplitHCursor
+                            Qt.CursorShape.SplitHCursor
                             if self.swipe_item.orientation == "vertical"
-                            else Qt.SplitVCursor
+                            else Qt.CursorShape.SplitVCursor
                         )
                         return True
 
-            elif event.type() == QEvent.MouseMove:
+            elif event.type() == QEvent.Type.MouseMove:
                 if self._is_dragging:
                     self._update_position(event.pos())
                     return True
                 elif self._is_on_divider(event.pos()):
                     self.canvas.viewport().setCursor(
-                        Qt.SplitHCursor
+                        Qt.CursorShape.SplitHCursor
                         if self.swipe_item.orientation == "vertical"
-                        else Qt.SplitVCursor
+                        else Qt.CursorShape.SplitVCursor
                     )
                 else:
                     self.canvas.viewport().unsetCursor()
 
-            elif event.type() == QEvent.MouseButtonRelease:
+            elif event.type() == QEvent.Type.MouseButtonRelease:
                 if self._is_dragging:
                     self._is_dragging = False
                     self.canvas.viewport().unsetCursor()
                     return True
 
-        except Exception:
+        except Exception:  # nosec B110
+            # Mouse-event filter; never let an unexpected error bubble up
+            # into the QGIS event loop and crash the canvas.
             pass
 
         return False
@@ -494,7 +496,8 @@ class SwipeMapTool(QObject):
             self.swipe_item.swipe_position = new_pos
             self.swipe_item.update()
 
-        except Exception:
+        except Exception:  # nosec B110
+            # Live drag handler; swallow to keep dragging responsive.
             pass
 
 
@@ -512,7 +515,9 @@ class SwipeDockWidget(QDockWidget):
         self.iface = iface
         self.canvas = iface.mapCanvas()
 
-        self.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
+        self.setAllowedAreas(
+            Qt.DockWidgetArea.LeftDockWidgetArea | Qt.DockWidgetArea.RightDockWidgetArea
+        )
 
         # Create swipe components
         self.swipe_item = SwipeMapItem(self.canvas)
@@ -562,7 +567,7 @@ class SwipeDockWidget(QDockWidget):
         header_font.setPointSize(12)
         header_font.setBold(True)
         header_label.setFont(header_font)
-        header_label.setAlignment(Qt.AlignCenter)
+        header_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(header_label)
 
         # Description
@@ -618,7 +623,7 @@ class SwipeDockWidget(QDockWidget):
         # Slider for position
         slider_layout = QHBoxLayout()
 
-        self.position_slider = QSlider(Qt.Horizontal)
+        self.position_slider = QSlider(Qt.Orientation.Horizontal)
         self.position_slider.setRange(0, 100)
         self.position_slider.setValue(50)
         self.position_slider.setToolTip("Swipe divider position")
@@ -684,8 +689,8 @@ class SwipeDockWidget(QDockWidget):
 
         # Separator
         separator = QFrame()
-        separator.setFrameShape(QFrame.HLine)
-        separator.setFrameShadow(QFrame.Sunken)
+        separator.setFrameShape(QFrame.Shape.HLine)
+        separator.setFrameShadow(QFrame.Shadow.Sunken)
         layout.addWidget(separator)
 
         # Additional controls

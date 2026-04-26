@@ -230,7 +230,9 @@ class QgisLeafmap:
             # Make sure to clean up the swipe tool
             try:
                 self._swipe_dock.cleanup()
-            except Exception:
+            except Exception:  # nosec B110
+                # Best-effort cleanup during plugin unload; we still want to
+                # remove the dock even if its internal cleanup raises.
                 pass
             self.iface.removeDockWidget(self._swipe_dock)
             self._swipe_dock.deleteLater()
@@ -249,7 +251,8 @@ class QgisLeafmap:
         if self._coordinates_dock:
             try:
                 self._coordinates_dock.cleanup()
-            except Exception:
+            except Exception:  # nosec B110
+                # Best-effort cleanup during plugin unload.
                 pass
             self.iface.removeDockWidget(self._coordinates_dock)
             self._coordinates_dock.deleteLater()
@@ -258,7 +261,8 @@ class QgisLeafmap:
         if self._export_dock:
             try:
                 self._export_dock.cleanup()
-            except Exception:
+            except Exception:  # nosec B110
+                # Best-effort cleanup during plugin unload.
                 pass
             self.iface.removeDockWidget(self._export_dock)
             self._export_dock.deleteLater()
@@ -290,7 +294,7 @@ class QgisLeafmap:
                     self._on_transparency_visibility_changed
                 )
                 self.iface.addDockWidget(
-                    Qt.RightDockWidgetArea, self._transparency_dock
+                    Qt.DockWidgetArea.RightDockWidgetArea, self._transparency_dock
                 )
                 self._transparency_dock.show()
                 self._transparency_dock.raise_()
@@ -327,7 +331,9 @@ class QgisLeafmap:
                 self._swipe_dock.visibilityChanged.connect(
                     self._on_swipe_visibility_changed
                 )
-                self.iface.addDockWidget(Qt.RightDockWidgetArea, self._swipe_dock)
+                self.iface.addDockWidget(
+                    Qt.DockWidgetArea.RightDockWidgetArea, self._swipe_dock
+                )
                 self._swipe_dock.show()
                 self._swipe_dock.raise_()
                 return
@@ -365,7 +371,9 @@ class QgisLeafmap:
                 self._settings_dock.visibilityChanged.connect(
                     self._on_settings_visibility_changed
                 )
-                self.iface.addDockWidget(Qt.RightDockWidgetArea, self._settings_dock)
+                self.iface.addDockWidget(
+                    Qt.DockWidgetArea.RightDockWidgetArea, self._settings_dock
+                )
                 self._settings_dock.show()
                 self._settings_dock.raise_()
                 return
@@ -403,7 +411,9 @@ class QgisLeafmap:
                 self._code_editor_dock.visibilityChanged.connect(
                     self._on_code_editor_visibility_changed
                 )
-                self.iface.addDockWidget(Qt.RightDockWidgetArea, self._code_editor_dock)
+                self.iface.addDockWidget(
+                    Qt.DockWidgetArea.RightDockWidgetArea, self._code_editor_dock
+                )
                 self._code_editor_dock.show()
                 self._code_editor_dock.raise_()
                 return
@@ -441,7 +451,9 @@ class QgisLeafmap:
                 self._coordinates_dock.visibilityChanged.connect(
                     self._on_coordinates_visibility_changed
                 )
-                self.iface.addDockWidget(Qt.RightDockWidgetArea, self._coordinates_dock)
+                self.iface.addDockWidget(
+                    Qt.DockWidgetArea.RightDockWidgetArea, self._coordinates_dock
+                )
                 self._coordinates_dock.show()
                 self._coordinates_dock.raise_()
                 return
@@ -479,7 +491,9 @@ class QgisLeafmap:
                 self._export_dock.visibilityChanged.connect(
                     self._on_export_visibility_changed
                 )
-                self.iface.addDockWidget(Qt.RightDockWidgetArea, self._export_dock)
+                self.iface.addDockWidget(
+                    Qt.DockWidgetArea.RightDockWidgetArea, self._export_dock
+                )
                 self._export_dock.show()
                 self._export_dock.raise_()
                 return
@@ -566,7 +580,7 @@ class QgisLeafmap:
 
         try:
             dialog = UpdateCheckerDialog(self.plugin_dir, self.iface.mainWindow())
-            dialog.exec_()
+            dialog.exec()
         except Exception as e:
             QMessageBox.critical(
                 self.iface.mainWindow(),

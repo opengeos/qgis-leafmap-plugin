@@ -34,7 +34,7 @@ Compare two layers by swiping between them. Select left and right layers, choose
 
 ## Requirements
 
-- QGIS 3.28 or later
+- QGIS 3.28 or later (including QGIS 4.0)
 - Python 3.10+
 
 ## Installation

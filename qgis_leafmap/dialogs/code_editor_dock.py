@@ -9,7 +9,7 @@ import os
 import sys
 from io import StringIO
 
-from qgis.PyQt.QtCore import Qt, QSettings
+from qgis.PyQt.QtCore import Qt, QEvent, QSettings
 from qgis.PyQt.QtWidgets import (
     QDockWidget,
     QWidget,
@@ -56,7 +56,9 @@ class CodeEditorDockWidget(QDockWidget):
         self.status_label = None
         self.splitter = None
 
-        self.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
+        self.setAllowedAreas(
+            Qt.DockWidgetArea.LeftDockWidgetArea | Qt.DockWidgetArea.RightDockWidgetArea
+        )
 
         self._setup_ui()
         self._setup_shortcuts()
@@ -77,7 +79,7 @@ class CodeEditorDockWidget(QDockWidget):
         layout.addWidget(self.toolbar)
 
         # Splitter for editor and output
-        self.splitter = QSplitter(Qt.Vertical)
+        self.splitter = QSplitter(Qt.Orientation.Vertical)
 
         # Editor
         self.editor = self._setup_editor()
@@ -180,7 +182,7 @@ class CodeEditorDockWidget(QDockWidget):
         toolbar.addAction(run_sel_action)
         # Hide text to show only icon (consistent with other buttons)
         toolbar.widgetForAction(run_sel_action).setToolButtonStyle(
-            Qt.ToolButtonIconOnly
+            Qt.ToolButtonStyle.ToolButtonIconOnly
         )
 
         # Clear output
@@ -253,9 +255,13 @@ for layer_id, layer in layers.items():
     def _setup_shortcuts(self):
         """Configure keyboard shortcuts."""
         # File operations
-        QShortcut(QKeySequence.New, self).activated.connect(self._new_file)
-        QShortcut(QKeySequence.Open, self).activated.connect(self._open_file)
-        QShortcut(QKeySequence.Save, self).activated.connect(self._save_file)
+        QShortcut(QKeySequence.StandardKey.New, self).activated.connect(self._new_file)
+        QShortcut(QKeySequence.StandardKey.Open, self).activated.connect(
+            self._open_file
+        )
+        QShortcut(QKeySequence.StandardKey.Save, self).activated.connect(
+            self._save_file
+        )
         QShortcut(QKeySequence("Ctrl+Shift+S"), self).activated.connect(
             self._save_file_as
         )
@@ -268,9 +274,14 @@ for layer_id, layer in layers.items():
 
     def eventFilter(self, obj, event):
         """Event filter to catch keyboard shortcuts in the editor."""
-        if obj == self.editor and event.type() == event.KeyPress:
-            # Check for Ctrl+/ (comment toggle)
-            if event.modifiers() == Qt.ControlModifier and event.key() == Qt.Key_Slash:
+        if obj == self.editor and event.type() == QEvent.Type.KeyPress:
+            # Check for Ctrl+/ (comment toggle). Use bitwise check so the
+            # shortcut still triggers on layouts where typing "/" requires
+            # additional modifiers (e.g. Shift on some keyboards).
+            if (
+                event.modifiers() & Qt.KeyboardModifier.ControlModifier
+                and event.key() == Qt.Key.Key_Slash
+            ):
                 self._toggle_comment()
                 return True  # Event handled
         return super().eventFilter(obj, event)
@@ -432,13 +443,15 @@ for layer_id, layer in layers.items():
             self,
             "Unsaved Changes",
             f"'{file_name}' has unsaved changes.\n\nDo you want to save them?",
-            QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel,
-            QMessageBox.Save,
+            QMessageBox.StandardButton.Save
+            | QMessageBox.StandardButton.Discard
+            | QMessageBox.StandardButton.Cancel,
+            QMessageBox.StandardButton.Save,
         )
 
-        if reply == QMessageBox.Save:
+        if reply == QMessageBox.StandardButton.Save:
             return self._save_file()
-        elif reply == QMessageBox.Discard:
+        elif reply == QMessageBox.StandardButton.Discard:
             return True
         else:  # Cancel
             return False
@@ -466,9 +479,15 @@ for layer_id, layer in layers.items():
     def _execute_code(self, code, is_selection=False):
         """Execute Python code with QGIS context and output capture.
 
+        Security note: ``exec`` is intentional here. The code editor is a
+        Python REPL that runs scripts authored by the QGIS user in their own
+        QGIS process, mirroring the built-in PyQGIS console. Sandboxing
+        would defeat the feature. The Bandit B102 finding on the ``exec``
+        line below is therefore suppressed with ``# nosec``.
+
         Args:
-            code (str): Python code to execute
-            is_selection (bool): Whether this is selected code or full script
+            code (str): Python code to execute.
+            is_selection (bool): Whether this is selected code or full script.
         """
         # Prepare output capture
         stdout_capture = StringIO()
@@ -493,7 +512,7 @@ for layer_id, layer in layers.items():
             self._append_output(f"Executing {label}...\n", color="#00D4FF")
 
             # Execute the code
-            exec(code, exec_globals)
+            exec(code, exec_globals)  # nosec B102
 
             # Get captured output
             stdout_text = stdout_capture.getvalue()

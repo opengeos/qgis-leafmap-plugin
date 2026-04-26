@@ -85,7 +85,9 @@ class BBoxDrawTool(QgsMapTool):
         self.is_drawing = False
 
         # Create rubber band for visual feedback
-        self.rubber_band = QgsRubberBand(canvas, QgsWkbTypes.PolygonGeometry)
+        self.rubber_band = QgsRubberBand(
+            canvas, QgsWkbTypes.GeometryType.PolygonGeometry
+        )
         self.rubber_band.setColor(QColor(255, 0, 0, 100))
         self.rubber_band.setWidth(2)
         self.rubber_band.setFillColor(QColor(255, 0, 0, 50))
@@ -129,11 +131,11 @@ class BBoxDrawTool(QgsMapTool):
             self.callback(extent, crs)
 
             # Clear rubber band after short delay to show the final bbox
-            self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+            self.rubber_band.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
 
     def _update_rubber_band(self):
         """Update the rubber band visualization."""
-        self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+        self.rubber_band.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
 
         if self.start_point and self.end_point:
             # Create rectangle points
@@ -150,14 +152,14 @@ class BBoxDrawTool(QgsMapTool):
     def cleanup(self):
         """Clean up the rubber band."""
         if self.rubber_band:
-            self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+            self.rubber_band.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
             self.canvas.scene().removeItem(self.rubber_band)
             self.rubber_band = None
 
     def deactivate(self):
         """Deactivate the tool and clean up."""
         if self.rubber_band:
-            self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+            self.rubber_band.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
         super().deactivate()
 
 
@@ -175,7 +177,9 @@ class CoordinatesDockWidget(QDockWidget):
         self.iface = iface
         self.canvas = iface.mapCanvas()
 
-        self.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
+        self.setAllowedAreas(
+            Qt.DockWidgetArea.LeftDockWidgetArea | Qt.DockWidgetArea.RightDockWidgetArea
+        )
 
         # Map tools
         self._click_tool = None
@@ -201,7 +205,7 @@ class CoordinatesDockWidget(QDockWidget):
         header_font.setPointSize(12)
         header_font.setBold(True)
         header_label.setFont(header_font)
-        header_label.setAlignment(Qt.AlignCenter)
+        header_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(header_label)
 
         # Description

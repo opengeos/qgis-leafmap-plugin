@@ -36,6 +36,19 @@ METADATA_URL = f"https://raw.githubusercontent.com/{GITHUB_REPO}/{GITHUB_BRANCH}
 ZIP_URL = f"https://github.com/{GITHUB_REPO}/archive/refs/heads/{GITHUB_BRANCH}.zip"
 
 
+def _require_https(url):
+    """Reject any URL that is not https://, to satisfy Bandit B310.
+
+    Args:
+        url: The URL string to validate.
+
+    Raises:
+        ValueError: If url does not begin with ``https://``.
+    """
+    if not url.startswith("https://"):
+        raise ValueError(f"Refusing non-HTTPS URL: {url!r}")
+
+
 class VersionCheckWorker(QThread):
     """Worker thread for checking the latest version from GitHub."""
 
@@ -45,7 +58,8 @@ class VersionCheckWorker(QThread):
     def run(self):
         """Fetch the latest metadata from GitHub."""
         try:
-            with urlopen(METADATA_URL, timeout=15) as response:
+            _require_https(METADATA_URL)
+            with urlopen(METADATA_URL, timeout=15) as response:  # nosec B310
                 content = response.read().decode("utf-8")
 
             # Parse version from metadata
@@ -106,7 +120,8 @@ class DownloadWorker(QThread):
                     percent = min(int((downloaded / total_size) * 50), 50)
                     self.progress.emit(10 + percent, "Downloading...")
 
-            urlretrieve(ZIP_URL, zip_path, reporthook)
+            _require_https(ZIP_URL)
+            urlretrieve(ZIP_URL, zip_path, reporthook)  # nosec B310
 
             self.progress.emit(60, "Extracting files...")
 
@@ -232,7 +247,7 @@ class UpdateCheckerDialog(QDialog):
         header_font.setPointSize(14)
         header_font.setBold(True)
         header_label.setFont(header_font)
-        header_label.setAlignment(Qt.AlignCenter)
+        header_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(header_label)
 
         # Version info group
@@ -277,7 +292,7 @@ class UpdateCheckerDialog(QDialog):
         # Progress label
         self.progress_label = QLabel("")
         self.progress_label.setVisible(False)
-        self.progress_label.setAlignment(Qt.AlignCenter)
+        self.progress_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.progress_label)
 
         # Buttons
@@ -306,7 +321,7 @@ class UpdateCheckerDialog(QDialog):
         )
         info_label.setWordWrap(True)
         info_label.setOpenExternalLinks(True)
-        info_label.setAlignment(Qt.AlignCenter)
+        info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(info_label)
 
     def check_for_updates(self):
@@ -397,11 +412,11 @@ class UpdateCheckerDialog(QDialog):
             f"This will download and install version {self.latest_version}.\n\n"
             "IMPORTANT: You will need to restart QGIS after the update completes.\n\n"
             "Do you want to continue?",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No,
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
         )
 
-        if reply != QMessageBox.Yes:
+        if reply != QMessageBox.StandardButton.Yes:
             return
 
         self.check_btn.setEnabled(False)
@@ -482,10 +497,10 @@ class UpdateCheckerDialog(QDialog):
                 self,
                 "Download in Progress",
                 "A download is in progress. Are you sure you want to cancel?",
-                QMessageBox.Yes | QMessageBox.No,
-                QMessageBox.No,
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No,
             )
-            if reply != QMessageBox.Yes:
+            if reply != QMessageBox.StandardButton.Yes:
                 event.ignore()
                 return
             self.download_worker.terminate()
