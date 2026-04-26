@@ -1,8 +1,9 @@
 [general]
 name=Leafmap
 qgisMinimumVersion=3.28
+qgisMaximumVersion=4.99
 description=A QGIS plugin for interactive layer comparison with transparency control and swipe tools.
-version=0.4.0
+version=0.5.0
 author=Qiusheng Wu
 email=giswqs@gmail.com
 
@@ -33,6 +34,8 @@ experimental=False
 deprecated=False
 
 changelog=
+    0.5.0
+        - Compatible with QGIS 4.0 (Qt6) while keeping QGIS 3.x support
     0.4.0
         - Add support for exporting GeoTIFF from XYZ and WMS layers (#11)
     0.3.0

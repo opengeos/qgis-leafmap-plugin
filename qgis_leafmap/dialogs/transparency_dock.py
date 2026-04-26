@@ -58,11 +58,13 @@ class LayerTransparencyWidget(QWidget):
         layout.addWidget(self.name_label)
 
         # Transparency slider
-        self.slider = QSlider(Qt.Horizontal)
+        self.slider = QSlider(Qt.Orientation.Horizontal)
         self.slider.setRange(0, 100)
         self.slider.setValue(0)
         self.slider.setToolTip("Layer transparency (0-100%)")
-        self.slider.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.slider.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
+        )
         self.slider.valueChanged.connect(self._on_slider_changed)
         layout.addWidget(self.slider)
 
@@ -134,7 +136,9 @@ class TransparencyDockWidget(QDockWidget):
         self.iface = iface
         self.layer_widgets = {}
 
-        self.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
+        self.setAllowedAreas(
+            Qt.DockWidgetArea.LeftDockWidgetArea | Qt.DockWidgetArea.RightDockWidgetArea
+        )
 
         self._setup_ui()
 
@@ -188,7 +192,7 @@ class TransparencyDockWidget(QDockWidget):
         header_font.setPointSize(12)
         header_font.setBold(True)
         header_label.setFont(header_font)
-        header_label.setAlignment(Qt.AlignCenter)
+        header_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(header_label)
 
         # Description
@@ -222,8 +226,8 @@ class TransparencyDockWidget(QDockWidget):
         # Scroll area for layer controls
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
-        scroll_area.setFrameShape(QFrame.NoFrame)
-        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroll_area.setFrameShape(QFrame.Shape.NoFrame)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
         # Container widget for layer controls
         self.layers_container = QWidget()

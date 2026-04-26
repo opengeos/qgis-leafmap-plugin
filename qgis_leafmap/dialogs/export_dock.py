@@ -168,7 +168,9 @@ class BBoxDrawTool(QgsMapTool):
         self.end_point = None
         self.is_drawing = False
 
-        self.rubber_band = QgsRubberBand(canvas, QgsWkbTypes.PolygonGeometry)
+        self.rubber_band = QgsRubberBand(
+            canvas, QgsWkbTypes.GeometryType.PolygonGeometry
+        )
         self.rubber_band.setColor(QColor(255, 0, 0, 100))
         self.rubber_band.setWidth(2)
         self.rubber_band.setFillColor(QColor(255, 0, 0, 50))
@@ -199,14 +201,14 @@ class BBoxDrawTool(QgsMapTool):
             self.callback(extent, crs)
 
             if self.rubber_band:
-                self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+                self.rubber_band.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
 
     def _update_rubber_band(self):
         """Update the rubber band visualization."""
         if not self.rubber_band:
             return
 
-        self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+        self.rubber_band.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
 
         if self.start_point and self.end_point:
             p1 = self.start_point
@@ -222,14 +224,14 @@ class BBoxDrawTool(QgsMapTool):
     def cleanup(self):
         """Clean up the rubber band."""
         if self.rubber_band:
-            self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+            self.rubber_band.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
             self.canvas.scene().removeItem(self.rubber_band)
             self.rubber_band = None
 
     def deactivate(self):
         """Deactivate the tool and clean up."""
         if self.rubber_band:
-            self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+            self.rubber_band.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
         super().deactivate()
 
 
@@ -251,7 +253,9 @@ class ExportDockWidget(QDockWidget):
         self._previous_tool = None
         self._layer_lookup = {}
 
-        self.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
+        self.setAllowedAreas(
+            Qt.DockWidgetArea.LeftDockWidgetArea | Qt.DockWidgetArea.RightDockWidgetArea
+        )
 
         self._setup_ui()
         self._connect_project_signals()
@@ -271,7 +275,7 @@ class ExportDockWidget(QDockWidget):
         header_font.setPointSize(12)
         header_font.setBold(True)
         header_label.setFont(header_font)
-        header_label.setAlignment(Qt.AlignCenter)
+        header_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(header_label)
 
         desc_label = QLabel(
@@ -816,10 +820,10 @@ class ExportDockWidget(QDockWidget):
                     self,
                     "Overwrite?",
                     "Output file exists. Overwrite?",
-                    QMessageBox.Yes | QMessageBox.No,
-                    QMessageBox.No,
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                    QMessageBox.StandardButton.No,
                 )
-                if reply != QMessageBox.Yes:
+                if reply != QMessageBox.StandardButton.Yes:
                     return
 
             output_dir = os.path.dirname(output_path)
