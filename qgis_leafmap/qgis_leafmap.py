@@ -12,9 +12,9 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QMenu, QToolBar, QMessageBox
 
-
 TOOLBAR_OBJECT_NAME = "LeafmapToolbar"
 MENU_TITLE = "&Leafmap"
+
 
 class QgisLeafmap:
     """QgisLeafmap implementation class for QGIS."""
@@ -222,7 +222,6 @@ class QgisLeafmap:
             status_tip="About Leafmap QGIS Plugin",
             parent=self.iface.mainWindow(),
         )
-
 
     def _remove_toolbar(self, toolbar):
         """Detach and schedule deletion of a plugin toolbar widget."""
